@@ -10,6 +10,9 @@ readme          = "README.md"
 license         = { text = "MIT" }
 requires-python = ">=3.8"
 keywords        = ["system", "monitor", "psutil", "terminal", "performance", "insights"]
+authors         = [
+    { name = "Krishna4311", email = "mtarunp@gmail.com" }
+]
 
 dependencies = [
     "rich>=13.0.0",
@@ -20,6 +23,11 @@ dependencies = [
 [project.optional-dependencies]
 gpu = ["gputil>=1.4.0"]
 dev = ["pytest>=7.0", "pytest-cov"]
+
+[project.urls]
+Homepage      = "https://github.com/Krishna4311/sysvis"
+Repository    = "https://github.com/Krishna4311/sysvis"
+"Bug Tracker" = "https://github.com/Krishna4311/sysvis/issues"
 
 [project.scripts]
 sysvis = "sysvis.__main__:main"

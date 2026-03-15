@@ -4,6 +4,11 @@ from setuptools import setup, find_packages
 setup(
     name="sysvis",
     version="1.1.0",
+    description="Arrow-key terminal system monitor with actionable insights",
+    author="Krishna4311",
+    author_email="mtarunp@gmail.com",
+    url="https://github.com/Krishna4311/sysvis",
+    license="MIT",
     packages=find_packages(),
     install_requires=[
         "rich>=13.0.0",
@@ -13,4 +18,12 @@ setup(
     extras_require={"gpu": ["gputil>=1.4.0"]},
     entry_points={"console_scripts": ["sysvis=sysvis.__main__:main"]},
     python_requires=">=3.8",
+    keywords=["system", "monitor", "psutil", "terminal", "performance", "insights"],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Environment :: Console",
+        "Topic :: System :: Monitoring",
+    ],
 )
