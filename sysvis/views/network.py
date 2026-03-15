@@ -44,10 +44,10 @@ def network(collector):
         # ── Addresses ─────────────────────────────────────────────────────────
         section("Addresses")
         row("Hostname",    n.hostname)
-        row("Local IP",    n.local_ip,          value_style="bright_cyan")
-        row("Ethernet IP", n.ethernet_ip or "—")
-        row("WiFi IP",     n.wifi_ip     or "—")
-        row("WiFi SSID",   n.wifi_ssid   or "—")
+        row("Local IP",    n.local_ip,                    value_style="bright_cyan")
+        row("Ethernet IP", n.ethernet_ip or "—",          value_style="bright_green")
+        row("WiFi IP",     n.wifi_ip     or "Not connected")
+        row("WiFi SSID",   n.wifi_ssid   or "Not connected")
 
         # ── Interfaces ────────────────────────────────────────────────────────
         section("Interfaces")
@@ -75,19 +75,26 @@ def network(collector):
         dl_line.append_text(spark(hist_dl, 50))
         con.print(dl_line)
 
-        # ── Insights ──────────────────────────────────────────────────────────
+        # ── Insights ──────────────────────────────────────────────────────────────
         section("Insights")
         tips = []
+
+        # Only flag real physical interfaces that are down, not virtual ones
+        skip = ("lo", "loopback", "teredo", "zerotier", "local area connection")
+        down_ifaces = [
+            i for i in n.interfaces
+            if not i["is_up"]
+            and not any(s in i["name"].lower() for s in skip)
+            and i["ipv4"] and not i["ipv4"].startswith("169.254")  # skip self-assigned
+        ]
+
         if n.download_speed > 80 * 1024 * 1024:
-            tips.append(f"⚡  High download: {hb(n.download_speed,'B/s')} — large transfer in progress.")
+            tips.append(f"High download: {hb(n.download_speed,'B/s')} — large transfer in progress.")
         if n.upload_speed > 20 * 1024 * 1024:
-            tips.append(f"⚡  High upload: {hb(n.upload_speed,'B/s')} — check for backup or sync jobs.")
-        down_ifaces = [i for i in n.interfaces
-                       if not i["is_up"]
-                       and i["name"].lower() not in ("lo", "loopback")]
+            tips.append(f"High upload: {hb(n.upload_speed,'B/s')} — check for backup or sync jobs.")
         if down_ifaces:
             names = ", ".join(i["name"] for i in down_ifaces[:3])
-            tips.append(f"⚠   Interface(s) DOWN: {names}")
+            tips.append(f"Interface(s) DOWN: {names}")
         if not tips:
             tips.append("🟢  Network healthy — no issues detected.")
         for t in tips:

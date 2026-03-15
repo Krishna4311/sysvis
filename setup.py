@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="sysvis",
-    version="1.1.0",
+    version="1.1.1",
     description="Arrow-key terminal system monitor with actionable insights",
     author="Krishna4311",
     author_email="mtarunp@gmail.com",

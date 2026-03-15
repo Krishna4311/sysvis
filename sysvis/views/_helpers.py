@@ -38,6 +38,27 @@ def pcolor(p: float) -> str:
     if p >= 60: return "bright_yellow"
     return "bright_green"
 
+def pcolor_score(p: float) -> str:
+    """
+    Colour for a SCORE (higher = better, opposite of pcolor).
+    Used in health report where 80/100 is good, 20/100 is bad.
+    """
+    if p >= 60: return "bright_green"
+    if p >= 40: return "bright_yellow"
+    return "bright_red"
+
+
+def bar_score(score: float, w: int = 30) -> Text:
+    """
+    Progress bar for a health score (higher = greener).
+    Opposite colour logic to bar().
+    """
+    score = max(0.0, min(100.0, score))
+    n     = int(round(score / 100 * w))
+    t     = Text(no_wrap=True)
+    t.append("█" * n,       style=pcolor_score(score))
+    t.append("░" * (w - n), style="grey23")
+    return t
 
 def status_icon(p: float) -> str:
     if p >= 85: return "🔴"

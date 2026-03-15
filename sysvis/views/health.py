@@ -4,13 +4,17 @@ sysvis/views/health.py
 Health report — A-F grade per category with
 specific actionable recommendations.
 Single render — press any key to go back.
+
+Colour logic:
+  bars use bar_score() — green=good(high score), red=bad(low score)
+  this is OPPOSITE to regular bar() which is green=low, red=high
 """
 
 from rich.text import Text
 from ._helpers import (
-    con, pcolor, hb, uptime_str,
-    bar, section, row, insight,
-    getch,clear,
+    con, pcolor_score, bar_score, hb, uptime_str,
+    section, row, insight,
+    getch, clear,
 )
 
 
@@ -27,6 +31,12 @@ def health(collector):
 
     # ── Score each category 0-100 (higher = healthier) ────────────────────────
     def score(val, bad, ok):
+        """
+        val = current value (e.g. CPU %)
+        bad = threshold where score = 0   (e.g. 85%)
+        ok  = threshold where score = 50  (e.g. 60%)
+        below ok = score climbs to 100
+        """
         if val >= bad: return 0
         if val >= ok:  return int(50 * (bad - val) / (bad - ok))
         return int(50 + 50 * (ok - val) / ok)
@@ -38,12 +48,12 @@ def health(collector):
     disk_score = score(worst_disk,       90, 75)
     overall    = int((cpu_score + ram_score + swap_score + disk_score) / 4)
 
-    def grade(s):
-        if s >= 80: return ("A", "bright_green",  "Excellent")
-        if s >= 60: return ("B", "bright_green",  "Good")
-        if s >= 40: return ("C", "bright_yellow", "Fair")
-        if s >= 20: return ("D", "bright_red",    "Poor")
-        return             ("F", "bright_red",    "Critical")
+    def grade(sc):
+        if sc >= 80: return ("A", "bright_green",  "Excellent")
+        if sc >= 60: return ("B", "bright_green",  "Good")
+        if sc >= 40: return ("C", "bright_yellow", "Fair")
+        if sc >= 20: return ("D", "bright_red",    "Poor")
+        return              ("F", "bright_red",    "Critical")
 
     clear()
     con.print()
@@ -54,7 +64,7 @@ def health(collector):
     ov_g, ov_c, ov_label = grade(overall)
     ov_line = Text(no_wrap=True)
     ov_line.append("  Overall Score  ", style="cyan")
-    ov_line.append_text(bar(overall, 30))
+    ov_line.append_text(bar_score(overall, 30))
     ov_line.append(f"  {overall}/100  Grade: ", style="grey50")
     ov_line.append(f"{ov_g}  {ov_label}", style=f"bold {ov_c}")
     con.print(ov_line)
@@ -68,7 +78,7 @@ def health(collector):
         g, c, lbl = grade(sc)
         line = Text(no_wrap=True)
         line.append(f"  {label:<6}", style="cyan")
-        line.append_text(bar(sc, 22))
+        line.append_text(bar_score(sc, 22))
         line.append(f"  {sc:>3}/100  {g}  {lbl}", style=f"bold {c}")
         con.print(line)
 
@@ -141,7 +151,7 @@ def health(collector):
             f"  {icon}  [bold cyan]{cat:<6}[/]  [grey84]{msg}[/]"
         )
 
-    # ── Summary line ──────────────────────────────────────────────────────────
+    # ── Summary ───────────────────────────────────────────────────────────────
     con.print()
     con.print(
         f"  [grey50]System: {s.os_name} {s.os_release}  |  "

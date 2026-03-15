@@ -26,7 +26,7 @@ from .collectors.system import (
     SystemInfo,
 )
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__  = "sysvis contributors"
 
 __all__ = [
