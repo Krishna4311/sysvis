@@ -1,5 +1,7 @@
 # SYSVIS
-
+```
+[vibe coded {claude}]
+```
 > Arrow-key interactive terminal system monitor with real-time insights.
 
 ```
